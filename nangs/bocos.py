@@ -4,10 +4,8 @@ __all__ = ['Boco', 'PeriodicBoco']
 
 # Cell
 
-from .utils import *
-
 class Boco():
-    "Base class to work with bocos"
+    "Base class to work with bocos kk"
     def __init__(self):
         self.type = None
         self.bs = None
@@ -28,6 +26,8 @@ class Boco():
         self.bs = bs
 
 # Cell
+
+from .utils import *
 
 class PeriodicBoco(Boco):
     "Periodic boundary condition: The outputs of both inputs will be enforced to be equal."
