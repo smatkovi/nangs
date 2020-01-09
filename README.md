@@ -8,37 +8,41 @@
 
 -->
 
-# nangs
+# Welcome to nangs
 
 > Solving Partial Differential Equations with Neural Networks.
 
 
-This file will become your README and also the index of your documentation.
+Nangs is a Python library built on top of Pytorch to solve Partial Differential Equations.
 
-## Install
+Our objective is to develop a new tool for simulating nature, using Neural Networks as solution approximation to Partial Differential Equations, increasing accuracy and optimziation speed while reducing computational cost.
+
+Read our [paper](https://arxiv.org/abs/1912.04737) to know more.
+
+## Installing
+
+nangs is on PyPI so you can just run:
 
 `pip install nangs`
 
-## How to use
+## Getting Started
 
-Fill me in please! Don't forget code examples:
-<div class="codecell" markdown="1">
-<div class="input_area" markdown="1">
+Let's assume we want to solve the following PDE:
 
-```python
-1+1
-```
+\begin{equation}
+    \frac{\partial \phi}{\partial t} + u \frac{\partial \phi}{\partial x} = 0
+\end{equation}
 
-</div>
-<div class="output_area" markdown="1">
+Different numerical techniques that solve this problem exist, and all of them are based on finding an approximate function that satisfies the PDE. Traditional numerical methods discretize the domain into small elements where a form of the solutions is assumed (for example, a constant) and then the final solution is composed as a piece-wise, discontinuous function.
 
+Nangs uses the property of neural networks (NNs) as universal function approximators to find a continuous and derivable solution to the PDE, that requires significant less computing resources compared with traditional techniques and with the advantage of including the free-parameters as part of the solution.
 
+The independen variables (i.e, $x$ and $t$) are used as input values for the NN, and the solution (i.e. $\phi$) is the output. In order to find the solution, at each step the NN outputs are derived w.r.t the inputs. Then, a loss function that matches the PDE is built and the weights are updated accordingly. If the loss function goes to zero, we can assume that our NN is indeed the solution to our PDE.
 
+## Step by step guide
 
-    2
+Let's go through the code step by step. First, we import the nangs module to acces its predefined classes and operations to solve PDEs with NNs. The base class we work with is the PDE class, where we have all the methods to set the data and find a solution. Then, the bocos module gives us access to the different boundary conditions implemented.
 
+## Copyright
 
-
-</div>
-
-</div>
+Copyright 2020 onwards, SensioAI. Licensed under the Apache License, Version 2.0 (the "License"); you may not use this project's files except in compliance with the License. A copy of the License is provided in the LICENSE file in this repository.
