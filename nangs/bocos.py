@@ -5,7 +5,7 @@ __all__ = ['Boco', 'PeriodicBoco']
 # Cell
 
 class Boco():
-    "Base class to work with bocos kk"
+    "Base class to work with bocos"
     def __init__(self):
         self.type = None
         self.bs = None
