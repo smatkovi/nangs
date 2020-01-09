@@ -6,4 +6,4 @@ __all__ = ['hi']
 
 def hi():
     "Say hi"
-    print("hi")
+    return "hi"
