@@ -1,5 +1,5 @@
 # base nvidia cuda image
-FROM nvidia/cuda:10.1-cudnn7-devel-ubuntu16.04
+FROM nvidia/cuda:10.1-cudnn7-runtime-ubuntu16.04
 
 # install system libs
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -21,23 +21,14 @@ RUN conda install pytorch cudatoolkit=10.0 -c pytorch
 
 # install python libs
 RUN conda install \
-    jupyter \
     numpy \
     matplotlib 
 
 RUN pip --no-cache-dir install \
     --upgrade pip \
+    nangs \
     fastprogress \
     jupyter_contrib_nbextensions
-
-# install some jupyter notebook plugins
-RUN jupyter contrib nbextension install --user
-RUN jupyter nbextension enable codefolding/main
-RUN jupyter nbextension enable collapsible_headings/main
-RUN jupyter nbextension enable scroll_down/main
-RUN jupyter nbextension enable execute_time/ExecuteTime
-RUN jupyter nbextension enable livemdpreview/livemdpreview
-RUN jupyter nbextension enable spellchecker/main
 
 # install apex for mixed precision trainig
 #RUN git clone https://github.com/NVIDIA/apex.git

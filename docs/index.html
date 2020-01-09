@@ -39,6 +39,20 @@ summary: "Solving Partial Differential Equations with Neural Networks."
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
+
+<pre><code>docker run --rm -it -d \
+    --name=nangs \
+    --gpus=all \
+    --ipc=host \
+    -p 8888:8888 \
+    nangs-jupyter \
+    jupyter notebook --NotebookApp.token=$1 --ip=0.0.0.0 --port=8888 --allow-root --no-browser</code></pre>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <p>nangs is on PyPI so you can just run:</p>
 
 </div>
@@ -53,7 +67,28 @@ summary: "Solving Partial Differential Equations with Neural Networks."
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
+<p>You will also need to insall <a href="https://pytorch.org/">Pytorch</a>.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Alternatively, you can use one of our Docker <a href="https://hub.docker.com/repository/docker/sensioai/nangs">images</a>. You will need <a href="https://docs.docker.com/install/">Docker</a> 19.03 and, if you have an NVIDIA GPU, the NVIDIA Drivers (you do not need CUDA) and <a href="https://github.com/NVIDIA/nvidia-docker">nvidia-docker</a>.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Getting-Started">Getting Started<a class="anchor-link" href="#Getting-Started">&#182;</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We have GPU and CPU images</p>
+
 </div>
 </div>
 </div>
@@ -66,7 +101,8 @@ summary: "Solving Partial Differential Equations with Neural Networks."
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-$$\frac{\partial \phi}{\partial t} + u \frac{\partial \phi}{\partial x} = 0$$
+<p><img src="/nangs/./pics/adv1d.png" alt="adv1d"></p>
+
 </div>
 </div>
 </div>
@@ -74,10 +110,87 @@ $$\frac{\partial \phi}{\partial t} + u \frac{\partial \phi}{\partial x} = 0$$
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Different numerical techniques that solve this problem exist, and all of them are based on finding an approximate function that satisfies the PDE. Traditional numerical methods discretize the domain into small elements where a form of the solutions is assumed (for example, a constant) and then the final solution is composed as a piece-wise, discontinuous function.</p>
 <p>Nangs uses the property of neural networks (NNs) as universal function approximators to find a continuous and derivable solution to the PDE, that requires significant less computing resources compared with traditional techniques and with the advantage of including the free-parameters as part of the solution.</p>
-<p>The independen variables (i.e, $x$ and $t$) are used as input values for the NN, and the solution (i.e. $\phi$) is the output. In order to find the solution, at each step the NN outputs are derived w.r.t the inputs. Then, a loss function that matches the PDE is built and the weights are updated accordingly. If the loss function goes to zero, we can assume that our NN is indeed the solution to our PDE.</p>
+<p>The independen variables (i.e, <em>x</em> and <em>t</em>) are used as input values for the NN, and the solution (i.e. <em>p</em>) is the output. In order to find the solution, at each step the NN outputs are derived w.r.t the inputs. Then, a loss function that matches the PDE is built and the weights are updated accordingly. If the loss function goes to zero, we can assume that our NN is indeed the solution to our PDE.</p>
 
 </div>
 </div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span> 
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span> 
+
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="n">cuda</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda:0&quot;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="ow">and</span> <span class="n">cuda</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
+
+<span class="c1"># import nangs</span>
+<span class="kn">from</span> <span class="nn">nangs.pde</span> <span class="kn">import</span> <span class="n">PDE</span>
+<span class="kn">from</span> <span class="nn">nangs.bocos</span> <span class="kn">import</span> <span class="n">PeriodicBoco</span><span class="c1">#, DirichletBoco</span>
+
+<span class="c1"># define custom PDE</span>
+<span class="k">class</span> <span class="nc">MyPDE</span><span class="p">(</span><span class="n">PDE</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">computePdeLoss</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">grads</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span> 
+        <span class="c1"># here is where the magic happens</span>
+        <span class="n">dpdt</span><span class="p">,</span> <span class="n">dpdx</span> <span class="o">=</span> <span class="n">grads</span><span class="p">[</span><span class="s1">&#39;p&#39;</span><span class="p">][</span><span class="s1">&#39;t&#39;</span><span class="p">],</span> <span class="n">grads</span><span class="p">[</span><span class="s1">&#39;p&#39;</span><span class="p">][</span><span class="s1">&#39;x&#39;</span><span class="p">]</span>
+        <span class="n">u</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;u&#39;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">dpdt</span> <span class="o">+</span> <span class="n">u</span><span class="o">*</span><span class="n">dpdx</span>
+    
+<span class="c1"># instanciate pde</span>
+<span class="n">pde</span> <span class="o">=</span> <span class="n">MyPDE</span><span class="p">(</span><span class="n">inputs</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;t&#39;</span><span class="p">],</span> <span class="n">outputs</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;p&#39;</span><span class="p">],</span> <span class="n">params</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;u&#39;</span><span class="p">])</span>
+
+<span class="c1"># define input values for training</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">30</span><span class="p">)</span>
+<span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">])</span>
+<span class="n">pde</span><span class="o">.</span><span class="n">setValues</span><span class="p">({</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="n">x</span><span class="p">,</span> <span class="s1">&#39;t&#39;</span><span class="p">:</span> <span class="n">t</span><span class="p">,</span> <span class="s1">&#39;u&#39;</span><span class="p">:</span> <span class="n">u</span><span class="p">})</span>
+
+<span class="c1"># periodic b.c for the space dimension</span>
+<span class="n">x1</span><span class="p">,</span> <span class="n">x2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">boco</span> <span class="o">=</span> <span class="n">PeriodicBoco</span><span class="p">({</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="n">x1</span><span class="p">,</span> <span class="s1">&#39;t&#39;</span><span class="p">:</span> <span class="n">t</span><span class="p">},</span> <span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="n">x2</span><span class="p">,</span> <span class="s1">&#39;t&#39;</span><span class="p">:</span> <span class="n">t</span><span class="p">})</span>
+<span class="n">pde</span><span class="o">.</span><span class="n">addBoco</span><span class="p">(</span><span class="n">boco</span><span class="p">)</span>
+
+
+<span class="k">if</span> <span class="kc">False</span><span class="p">:</span>
+
+    <span class="c1"># initial condition (dirichlet for temporal dimension)</span>
+    <span class="n">p0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mf">2.</span><span class="o">*</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">boco</span> <span class="o">=</span> <span class="n">DirichletBoco</span><span class="p">(</span><span class="n">pde</span><span class="o">.</span><span class="n">inputs</span><span class="p">,</span> <span class="n">pde</span><span class="o">.</span><span class="n">outputs</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="n">x</span><span class="p">,</span> <span class="s1">&#39;t&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">])},</span> <span class="p">{</span><span class="s1">&#39;p&#39;</span><span class="p">:</span> <span class="n">p0</span><span class="p">})</span>
+    <span class="n">pde</span><span class="o">.</span><span class="n">addBoco</span><span class="p">(</span><span class="n">boco</span><span class="p">)</span>
+
+    <span class="c1"># define solution topology</span>
+    <span class="n">mlp</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;layers&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;neurons&#39;</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span> <span class="s1">&#39;activations&#39;</span><span class="p">:</span> <span class="s1">&#39;relu&#39;</span><span class="p">}</span>
+    <span class="n">pde</span><span class="o">.</span><span class="n">buildModel</span><span class="p">(</span><span class="n">mlp</span><span class="p">)</span>
+
+    <span class="c1"># set optimization parameters</span>
+    <span class="n">pde</span><span class="o">.</span><span class="n">setSolverParams</span><span class="p">(</span><span class="n">lr</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">epochs</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+
+    <span class="c1"># find the solution</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="s1">&#39;best_model.pth&#39;</span>
+    <span class="n">pde</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">device</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span> 
+
+    <span class="c1"># evaluate the solution</span>
+    <span class="n">pde</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">50</span><span class="p">)</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">4</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">_t</span> <span class="ow">in</span> <span class="n">t</span><span class="p">:</span>
+        <span class="n">p0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mf">2.</span><span class="o">*</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="p">(</span><span class="n">x</span><span class="o">-</span><span class="n">u</span><span class="o">*</span><span class="n">_t</span><span class="p">))</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">pde</span><span class="o">.</span><span class="n">eval</span><span class="p">({</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="n">x</span><span class="p">,</span> <span class="s1">&#39;t&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">_t</span><span class="p">])},</span> <span class="n">device</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="s1">&#39;k&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">p0</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">

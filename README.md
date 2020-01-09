@@ -21,21 +21,111 @@ Read our [paper](https://arxiv.org/abs/1912.04737) to know more.
 
 ## Installing
 
+```
+docker run --rm -it -d \
+    --name=nangs \
+    --gpus=all \
+    --ipc=host \
+    -p 8888:8888 \
+    nangs-jupyter \
+    jupyter notebook --NotebookApp.token=$1 --ip=0.0.0.0 --port=8888 --allow-root --no-browser
+```
+
 nangs is on PyPI so you can just run:
 
 `pip install nangs`
 
+You will also need to insall [Pytorch](https://pytorch.org/).
+
+Alternatively, you can use one of our Docker [images](https://hub.docker.com/repository/docker/sensioai/nangs). You will need [Docker](https://docs.docker.com/install/) 19.03 and, if you have an NVIDIA GPU, the NVIDIA Drivers (you do not need CUDA) and [nvidia-docker](https://github.com/NVIDIA/nvidia-docker). 
+
 ## Getting Started
+
+We have GPU and CPU images
 
 Let's assume we want to solve the following PDE:
 
-$$\frac{\partial \phi}{\partial t} + u \frac{\partial \phi}{\partial x} = 0$$
+![adv1d](pics/adv1d.png)
 
 Different numerical techniques that solve this problem exist, and all of them are based on finding an approximate function that satisfies the PDE. Traditional numerical methods discretize the domain into small elements where a form of the solutions is assumed (for example, a constant) and then the final solution is composed as a piece-wise, discontinuous function.
 
 Nangs uses the property of neural networks (NNs) as universal function approximators to find a continuous and derivable solution to the PDE, that requires significant less computing resources compared with traditional techniques and with the advantage of including the free-parameters as part of the solution.
 
-The independen variables (i.e, $x$ and $t$) are used as input values for the NN, and the solution (i.e. $\phi$) is the output. In order to find the solution, at each step the NN outputs are derived w.r.t the inputs. Then, a loss function that matches the PDE is built and the weights are updated accordingly. If the loss function goes to zero, we can assume that our NN is indeed the solution to our PDE.
+The independen variables (i.e, *x* and *t*) are used as input values for the NN, and the solution (i.e. *p*) is the output. In order to find the solution, at each step the NN outputs are derived w.r.t the inputs. Then, a loss function that matches the PDE is built and the weights are updated accordingly. If the loss function goes to zero, we can assume that our NN is indeed the solution to our PDE.
+<div class="codecell" markdown="1">
+<div class="input_area" markdown="1">
+
+```python
+import math
+import numpy as np 
+import matplotlib.pyplot as plt 
+
+import torch
+cuda = False
+device = torch.device("cuda:0" if torch.cuda.is_available() and cuda else "cpu")
+
+# import nangs
+from nangs.pde import PDE
+from nangs.bocos import PeriodicBoco#, DirichletBoco
+
+# define custom PDE
+class MyPDE(PDE):
+    def __init__(self, inputs, outputs, params=None):
+        super().__init__(inputs, outputs, params)
+    def computePdeLoss(self, grads, inputs, params): 
+        # here is where the magic happens
+        dpdt, dpdx = grads['p']['t'], grads['p']['x']
+        u = params['u']
+        return dpdt + u*dpdx
+    
+# instanciate pde
+pde = MyPDE(inputs=['x', 't'], outputs=['p'], params=['u'])
+
+# define input values for training
+x = np.linspace(0,1,30)
+t = np.linspace(0,1,20)
+u = np.array([1.0])
+pde.setValues({'x': x, 't': t, 'u': u})
+
+# periodic b.c for the space dimension
+x1, x2 = np.array([0]), np.array([1])
+boco = PeriodicBoco({'x': x1, 't': t}, {'x': x2, 't': t})
+pde.addBoco(boco)
+
+
+if False:
+
+    # initial condition (dirichlet for temporal dimension)
+    p0 = np.sin(2.*math.pi*x)
+    boco = DirichletBoco(pde.inputs, pde.outputs, {'x': x, 't': np.array([0])}, {'p': p0})
+    pde.addBoco(boco)
+
+    # define solution topology
+    mlp = {'layers': 3, 'neurons': 100, 'activations': 'relu'}
+    pde.buildModel(mlp)
+
+    # set optimization parameters
+    pde.setSolverParams(lr=0.01, epochs=20, batch_size=50)
+
+    # find the solution
+    path = 'best_model.pth'
+    pde.solve(device, path) 
+
+    # evaluate the solution
+    pde.model.load_state_dict(torch.load(path))
+    x = np.linspace(0,1,50)
+    t = np.linspace(0,1,4)
+    for _t in t:
+        p0 = np.sin(2.*math.pi*(x-u*_t))
+        p = pde.eval({'x': x, 't': np.array([_t])}, device)
+        plt.plot(x, p, 'k')
+        plt.plot(x, p0)
+        plt.show()
+```
+
+</div>
+
+</div>
 
 ## Step by step guide
 

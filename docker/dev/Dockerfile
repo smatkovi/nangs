@@ -1,5 +1,5 @@
 # base nvidia cuda image
-FROM nvidia/cuda:10.1-cudnn7-devel-ubuntu16.04
+FROM nvidia/cuda:10.1-cudnn7-runtime-ubuntu16.04
 
 # install system libs
 RUN apt-get update && apt-get install -y --no-install-recommends \
