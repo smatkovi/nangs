@@ -10,7 +10,7 @@ entries:
       title: Overview
       url: /
     - output: web,pdf
-      title: Utils
+      title: utils
       url: /utils
     - output: web,pdf
       title: PDE
