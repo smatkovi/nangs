@@ -9,10 +9,14 @@ index = {"checkIsListOfStr": "00_utils.ipynb",
          "checkValidArray": "00_utils.ipynb",
          "checkValidDict": "00_utils.ipynb",
          "setValue": "00_utils.ipynb",
-         "PDE": "01_pde.ipynb"}
+         "checkDictArray": "00_utils.ipynb",
+         "PDE": "01_pde.ipynb",
+         "Boco": "02_bocos.ipynb",
+         "PeriodicBoco": "02_bocos.ipynb"}
 
 modules = ["utils.py",
-           "pde.py"]
+           "pde.py",
+           "bocos.py"]
 
 doc_url = "https://juansensio.github.io/nangs/"
 

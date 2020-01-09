@@ -58,3 +58,13 @@ class PDE:
                 raise Exception('You cannot set values to outputs !')
             else:
                 raise Exception('Key '+ key +' not found !')
+
+    def addBoco(self, boco):
+        "Add a boco to the list of bocos"
+        boco.addBoco(self.input_keys, self.output_keys)
+        self.bocos += [boco]
+
+    def bocoSummary(self):
+        "Print summary of each boco"
+        for boco in self.bocos:
+            boco.summary(self.input_keys, self.output_keys, self.param_keys)
