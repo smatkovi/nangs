@@ -2,7 +2,7 @@ repository: juansensio/nangs
 output: web
 topnav_title: nangs
 site_title: nangs
-company_name: Sensio Artifitial Intelligence Solutions
+company_name: Sensio Artificial Intelligence Solutions
 description: Solving Partial Differential Equations with Neural Networks
 # Set to false to disable KaTeX math
 use_math: true

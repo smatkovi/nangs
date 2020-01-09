@@ -29,9 +29,7 @@ nangs is on PyPI so you can just run:
 
 Let's assume we want to solve the following PDE:
 
-$$\begin{equation}
-    \frac{\partial \phi}{\partial t} + u \frac{\partial \phi}{\partial x} = 0
-\end{equation}$$
+$$\frac{\partial \phi}{\partial t} + u \frac{\partial \phi}{\partial x} = 0$$
 
 Different numerical techniques that solve this problem exist, and all of them are based on finding an approximate function that satisfies the PDE. Traditional numerical methods discretize the domain into small elements where a form of the solutions is assumed (for example, a constant) and then the final solution is composed as a piece-wise, discontinuous function.
 
