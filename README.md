@@ -21,16 +21,6 @@ Read our [paper](https://arxiv.org/abs/1912.04737) to know more.
 
 ## Installing
 
-```
-docker run --rm -it -d \
-    --name=nangs \
-    --gpus=all \
-    --ipc=host \
-    -p 8888:8888 \
-    nangs-jupyter \
-    jupyter notebook --NotebookApp.token=$1 --ip=0.0.0.0 --port=8888 --allow-root --no-browser
-```
-
 nangs is on PyPI so you can just run:
 
 `pip install nangs`
