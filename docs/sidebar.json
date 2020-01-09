@@ -1,8 +1,8 @@
 {
   "nangs": {
     "Overview": "/",
-    "utils": "/utils",
     "PDE": "/pde",
-    "bocos": "/bocos"
+    "bocos": "/bocos",
+    "utils": "/utils"
   }
 }

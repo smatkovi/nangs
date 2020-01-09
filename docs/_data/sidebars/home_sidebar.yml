@@ -10,14 +10,14 @@ entries:
       title: Overview
       url: /
     - output: web,pdf
-      title: utils
-      url: /utils
-    - output: web,pdf
       title: PDE
       url: /pde
     - output: web,pdf
       title: bocos
       url: /bocos
+    - output: web,pdf
+      title: utils
+      url: /utils
     output: web
     title: nangs
   output: web
