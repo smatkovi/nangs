@@ -4,6 +4,7 @@ __all__ = ['checkIsListOfStr', 'checkUnique', 'initListOfStr']
 
 # Cell
 def checkIsListOfStr(l):
+    "Make sure that l is a list containing only strings"
     if not isinstance(l, list):
         raise Exception(str(l) + ' must be a list of strings')
     for i in l:
@@ -12,6 +13,7 @@ def checkIsListOfStr(l):
 
 # Cell
 def checkUnique(l):
+    "Make sure that l does not contain repeated elements"
     for i, item1 in enumerate(l):
         for j, item2 in enumerate(l):
             if i != j and item1 == item2:
