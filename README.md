@@ -1,6 +1,6 @@
 # NANGS
 
-A Python module built on top of Pytorch to solve Partial Differential Equations. 
+A Python library built on top of Pytorch to solve Partial Differential Equations. 
 
 Our objective is to develop a new tool for simulating nature, using Neural Networks as solution approximation to Partial Differential Equations, increasing accuracy and optimziation speed while reducing computational cost.
 
