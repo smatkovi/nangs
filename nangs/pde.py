@@ -4,30 +4,57 @@ __all__ = ['PDE']
 
 # Cell
 
+from .utils import *
+
 class PDE:
     "PDE class with basic functionality to solve PDEs with NNs"
     def __init__(self, inputs, outputs, params=None):
 
-        self.inputs = inputs
-        self.outputs = outputs
-        self.params = params
+        self.input_keys = inputs
+        self.output_keys = outputs
+        self.param_keys = params
 
         # initialize values
-        self.inputTrainValues = initListOfStr(self.inputs)
-        self.inputValValues = initListOfStr(self.inputs)
-        self.inputTestValues = initListOfStr(self.inputs)
-        self.outputValues = initListOfStr(self.outputs)
-        self.paramValues = None
+        self.train_inputs = initListOfStr(self.input_keys)
+        self.test_inputs = initListOfStr(self.input_keys)
+        self.outputs = initListOfStr(self.output_keys)
+        self.params = None
+        if self.param_keys:
+            self.params = initListOfStr(self.param_keys)
+
+        # make sure there are not repeated keys
+        checkNoRepeated(self.input_keys, self.output_keys)
         if self.params:
-            self.paramValues = initListOfStr(self.params)
+            checkNoRepeated(self.input_keys, self.param_keys)
+            checkNoRepeated(self.param_keys, self.output_keys)
 
         self.bocos = []
 
     def summary(self):
         "Print a summary of the PDE inputs, outputs, params and bocos."
-        print('inputs (train): ', {name: values for name, values in zip(self.inputs, self.inputTrainValues)})
-        print('inputs (val): ', {name: values for name, values in zip(self.inputs, self.inputValValues)})
-        print('outputs: ', {name: values for name, values in zip(self.outputs, self.outputValues)})
-        print('params: ', {name: values for name, values in zip(self.params, self.paramValues)})
+        print('inputs (train): ', {name: values for name, values in zip(self.input_keys, self.train_inputs)})
+        print('inputs (test): ', {name: values for name, values in zip(self.input_keys, self.test_inputs)})
+        print('outputs: ', {name: values for name, values in zip(self.output_keys, self.outputs)})
+        print('params: ', {name: values for name, values in zip(self.param_keys, self.params)})
         print('bocos: ', [boco.type for boco in self.bocos])
         print('')
+
+    def setValues(self, values, train=True):
+        "Set values for inputs and params"
+        checkValidDict(values)
+        for key in values:
+            value = values[key]
+            if key in self.input_keys:
+                if train:
+                    setValue(self.input_keys, self.train_inputs, key, value)
+                else:
+                    setValue(self.input_keys, self.test_inputs, key, value)
+            elif key in self.param_keys:
+                if train:
+                    setValue(self.param_keys, self.params, key, value)
+                else:
+                    raise Exception('You cannot set params in test data !')
+            elif key in self.output_keys:
+                raise Exception('You cannot set values to outputs !')
+            else:
+                raise Exception('Key '+ key +' not found !')
