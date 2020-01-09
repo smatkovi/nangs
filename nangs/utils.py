@@ -4,5 +4,7 @@ __all__ = ['initStringList']
 
 # Cell
 def initStringList(l):
-    "Receives a list of strings and returns an empty list for each item"
+    "Receives a list of unique strings and returns an empty list for each item"
+    # TODO: assert l is a list of strings
+    # TODO: assert l does not contain repeated values
     return [[] for i in l]
