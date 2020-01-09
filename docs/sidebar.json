@@ -1,6 +1,7 @@
 {
   "nangs": {
     "Overview": "/",
-    "Hi": "/core"
+    "Utils": "/utils",
+    "PDE": "/pde"
   }
 }

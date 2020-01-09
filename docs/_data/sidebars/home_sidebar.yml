@@ -10,8 +10,11 @@ entries:
       title: Overview
       url: /
     - output: web,pdf
-      title: Hi
-      url: /core
+      title: Utils
+      url: /utils
+    - output: web,pdf
+      title: PDE
+      url: /pde
     output: web
     title: nangs
   output: web

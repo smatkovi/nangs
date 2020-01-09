@@ -2,9 +2,11 @@
 
 __all__ = ["index", "modules", "custom_doc_links", "git_url"]
 
-index = {"hi": "00_core.ipynb"}
+index = {"initStringList": "00_utils.ipynb",
+         "PDE": "01_pde.ipynb"}
 
-modules = ["hi.py"]
+modules = ["utils.py",
+           "pde.py"]
 
 doc_url = "https://juansensio.github.io/nangs/"
 
