@@ -35,7 +35,7 @@ Different numerical techniques that solve this problem exist, and all of them ar
 
 Nangs uses the property of neural networks (NNs) as universal function approximators to find a continuous and derivable solution to the PDE, that requires significant less computing resources compared with traditional techniques and with the advantage of including the free-parameters as part of the solution.
 
-The independen variables (i.e, $x$ and $t$) are used as input values for the NN, and the solution (i.e. $\phi$) is the output. In order to find the solution, at each step the NN outputs are derived w.r.t the inputs. Then, a loss function that matches the PDE is built and the weights are updated accordingly. If the loss function goes to zero, we can assume that our NN is indeed the solution to our PDE. kk
+The independen variables (i.e, $x$ and $t$) are used as input values for the NN, and the solution (i.e. $\phi$) is the output. In order to find the solution, at each step the NN outputs are derived w.r.t the inputs. Then, a loss function that matches the PDE is built and the weights are updated accordingly. If the loss function goes to zero, we can assume that our NN is indeed the solution to our PDE.
 
 ## Step by step guide
 
