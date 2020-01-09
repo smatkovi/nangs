@@ -2,7 +2,9 @@
 
 __all__ = ["index", "modules", "custom_doc_links", "git_url"]
 
-index = {"initStringList": "00_utils.ipynb",
+index = {"checkIsListOfStr": "00_utils.ipynb",
+         "checkUnique": "00_utils.ipynb",
+         "initListOfStr": "00_utils.ipynb",
          "PDE": "01_pde.ipynb"}
 
 modules = ["utils.py",

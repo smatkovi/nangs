@@ -6,21 +6,22 @@ __all__ = ['PDE']
 
 class PDE:
     "PDE class with basic functionality to solve PDEs with NNs"
-    def __init__(self, inputs=None, outputs=None, params=[]):
+    def __init__(self, inputs, outputs, params=None):
 
         self.inputs = inputs
         self.outputs = outputs
         self.params = params
 
         # initialize values
-        self.inputTrainValues = initStringList(self.inputs)
-        self.inputValValues = initStringList(self.inputs)
-        self.inputTestValues = initStringList(self.inputs)
-        self.outputValues = initStringList(self.outputs)
-        self.paramValues = initStringList(self.params)
+        self.inputTrainValues = initListOfStr(self.inputs)
+        self.inputValValues = initListOfStr(self.inputs)
+        self.inputTestValues = initListOfStr(self.inputs)
+        self.outputValues = initListOfStr(self.outputs)
+        self.paramValues = None
+        if self.params:
+            self.paramValues = initListOfStr(self.params)
 
         self.bocos = []
-
 
     def summary(self):
         "Print a summary of the PDE inputs, outputs, params and bocos."
