@@ -197,7 +197,7 @@ class DirichletBoco(Boco):
 # Cell
 
 class NeumannBocoDataset(Dataset):
-    "Receives a dict of inputs and eturns every possible combination of the elements"
+    "Receives a dict of inputs and returns every possible combination of the elements"
     def __init__(self, inputs):
         self.inputs = np.array([inputs[k] for k in inputs])
         # length of the dataset (all possible combinations)
