@@ -5,6 +5,7 @@ __all__ = ["index", "modules", "custom_doc_links", "git_url"]
 index = {"PDE": "00_pde.ipynb",
          "Boco": "01_bocos.ipynb",
          "PeriodicBoco": "01_bocos.ipynb",
+         "DirichletBoco": "01_bocos.ipynb",
          "checkIsListOfStr": "09_utils.ipynb",
          "checkUnique": "09_utils.ipynb",
          "initListOfStr": "09_utils.ipynb",

@@ -35,7 +35,8 @@ class PDE:
         print('inputs (train): ', {name: values for name, values in zip(self.input_keys, self.train_inputs)})
         print('inputs (test): ', {name: values for name, values in zip(self.input_keys, self.test_inputs)})
         print('outputs: ', {name: values for name, values in zip(self.output_keys, self.outputs)})
-        print('params: ', {name: values for name, values in zip(self.param_keys, self.params)})
+        if self.params:
+            print('params: ', {name: values for name, values in zip(self.param_keys, self.params)})
         print('bocos: ', [boco.type for boco in self.bocos])
         print('')
 

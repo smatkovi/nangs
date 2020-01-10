@@ -56,7 +56,7 @@ device = torch.device("cuda:0" if torch.cuda.is_available() and cuda else "cpu")
 
 # import nangs
 from nangs.pde import PDE
-from nangs.bocos import PeriodicBoco#, DirichletBoco
+from nangs.bocos import PeriodicBoco, DirichletBoco
 
 # define custom PDE
 class MyPDE(PDE):
@@ -82,13 +82,12 @@ x1, x2 = np.array([0]), np.array([1])
 boco = PeriodicBoco({'x': x1, 't': t}, {'x': x2, 't': t})
 pde.addBoco(boco)
 
-
+# initial condition (dirichlet for temporal dimension)
+p0 = np.sin(2.*math.pi*x)
+boco = DirichletBoco({'x': x, 't': np.array([0])}, {'p': p0})
+pde.addBoco(boco)
+    
 if False:
-
-    # initial condition (dirichlet for temporal dimension)
-    p0 = np.sin(2.*math.pi*x)
-    boco = DirichletBoco(pde.inputs, pde.outputs, {'x': x, 't': np.array([0])}, {'p': p0})
-    pde.addBoco(boco)
 
     # define solution topology
     mlp = {'layers': 3, 'neurons': 100, 'activations': 'relu'}

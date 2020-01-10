@@ -116,7 +116,7 @@ summary: "Solving Partial Differential Equations with Neural Networks."
 
 <span class="c1"># import nangs</span>
 <span class="kn">from</span> <span class="nn">nangs.pde</span> <span class="kn">import</span> <span class="n">PDE</span>
-<span class="kn">from</span> <span class="nn">nangs.bocos</span> <span class="kn">import</span> <span class="n">PeriodicBoco</span><span class="c1">#, DirichletBoco</span>
+<span class="kn">from</span> <span class="nn">nangs.bocos</span> <span class="kn">import</span> <span class="n">PeriodicBoco</span><span class="p">,</span> <span class="n">DirichletBoco</span>
 
 <span class="c1"># define custom PDE</span>
 <span class="k">class</span> <span class="nc">MyPDE</span><span class="p">(</span><span class="n">PDE</span><span class="p">):</span>
@@ -142,13 +142,12 @@ summary: "Solving Partial Differential Equations with Neural Networks."
 <span class="n">boco</span> <span class="o">=</span> <span class="n">PeriodicBoco</span><span class="p">({</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="n">x1</span><span class="p">,</span> <span class="s1">&#39;t&#39;</span><span class="p">:</span> <span class="n">t</span><span class="p">},</span> <span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="n">x2</span><span class="p">,</span> <span class="s1">&#39;t&#39;</span><span class="p">:</span> <span class="n">t</span><span class="p">})</span>
 <span class="n">pde</span><span class="o">.</span><span class="n">addBoco</span><span class="p">(</span><span class="n">boco</span><span class="p">)</span>
 
-
+<span class="c1"># initial condition (dirichlet for temporal dimension)</span>
+<span class="n">p0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mf">2.</span><span class="o">*</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">x</span><span class="p">)</span>
+<span class="n">boco</span> <span class="o">=</span> <span class="n">DirichletBoco</span><span class="p">({</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="n">x</span><span class="p">,</span> <span class="s1">&#39;t&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">])},</span> <span class="p">{</span><span class="s1">&#39;p&#39;</span><span class="p">:</span> <span class="n">p0</span><span class="p">})</span>
+<span class="n">pde</span><span class="o">.</span><span class="n">addBoco</span><span class="p">(</span><span class="n">boco</span><span class="p">)</span>
+    
 <span class="k">if</span> <span class="kc">False</span><span class="p">:</span>
-
-    <span class="c1"># initial condition (dirichlet for temporal dimension)</span>
-    <span class="n">p0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mf">2.</span><span class="o">*</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">x</span><span class="p">)</span>
-    <span class="n">boco</span> <span class="o">=</span> <span class="n">DirichletBoco</span><span class="p">(</span><span class="n">pde</span><span class="o">.</span><span class="n">inputs</span><span class="p">,</span> <span class="n">pde</span><span class="o">.</span><span class="n">outputs</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="n">x</span><span class="p">,</span> <span class="s1">&#39;t&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">])},</span> <span class="p">{</span><span class="s1">&#39;p&#39;</span><span class="p">:</span> <span class="n">p0</span><span class="p">})</span>
-    <span class="n">pde</span><span class="o">.</span><span class="n">addBoco</span><span class="p">(</span><span class="n">boco</span><span class="p">)</span>
 
     <span class="c1"># define solution topology</span>
     <span class="n">mlp</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;layers&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;neurons&#39;</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span> <span class="s1">&#39;activations&#39;</span><span class="p">:</span> <span class="s1">&#39;relu&#39;</span><span class="p">}</span>
