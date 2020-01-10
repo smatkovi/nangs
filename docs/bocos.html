@@ -138,95 +138,6 @@ Input 2:  {&#39;a&#39;: &#39;a&#39;, &#39;b&#39;: &#39;b&#39;}
 
 </div>
 <div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="p">{</span><span class="s1">&#39;a&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">}</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>{&#39;a&#39;: 1, &#39;b&#39;: 2}</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">a</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">]</span>
-<span class="n">o</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;b&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">}</span>
-<span class="n">o</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>{&#39;b&#39;: 1, &#39;a&#39;: 2}</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">o</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">a</span><span class="p">}</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>{&#39;a&#39;: 2, &#39;b&#39;: 1}</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
 
 </div>
 <div class="cell border-box-sizing code_cell rendered">
@@ -240,17 +151,7 @@ Input 2:  {&#39;a&#39;: &#39;a&#39;, &#39;b&#39;: &#39;b&#39;}
 <div class="output_markdown rendered_html output_subarea ">
 <h2 id="DirichletBocoDataset" class="doc_header"><code>class</code> <code>DirichletBocoDataset</code><a href="https://github.com/juansensio/nangs/tree/master/nangs/bocos.py#L117" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>DirichletBocoDataset</code>(<strong><code>inputs</code></strong>, <strong><code>outputs</code></strong>) :: <code>Dataset</code></p>
 </blockquote>
-<p>An abstract class representing a :class:<code>Dataset</code>.</p>
-<p>All datasets that represent a map from keys to data samples should subclass
-it. All subclasses should overrite :meth:<code>__getitem__</code>, supporting fetching a
-data sample for a given key. Subclasses could also optionally overwrite
-:meth:<code>__len__</code>, which is expected to return the size of the dataset by many
-:class:<code>~torch.utils.data.Sampler</code> implementations and the default options
-of :class:<code>~torch.utils.data.DataLoader</code>.</p>
-<p>.. note::
-  :class:<code>~torch.utils.data.DataLoader</code> by default constructs a index
-  sampler that yields integral indices.  To make it work with a map-style
-  dataset with non-integral indices/keys, a custom sampler must be provided.</p>
+<p>Receives a dict of inputs and outputs and returns every possible combination of the elements in inputs     that must match the outputs</p>
 
 </div>
 
@@ -269,7 +170,7 @@ of :class:<code>~torch.utils.data.DataLoader</code>.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="DirichletBoco" class="doc_header"><code>class</code> <code>DirichletBoco</code><a href="https://github.com/juansensio/nangs/tree/master/nangs/bocos.py#L146" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>DirichletBoco</code>(<strong><code>name</code></strong>, <strong><code>inputs</code></strong>, <strong><code>outputs</code></strong>) :: <a href="/nangs/bocos#Boco"><code>Boco</code></a></p>
+<h2 id="DirichletBoco" class="doc_header"><code>class</code> <code>DirichletBoco</code><a href="https://github.com/juansensio/nangs/tree/master/nangs/bocos.py#L148" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>DirichletBoco</code>(<strong><code>name</code></strong>, <strong><code>inputs</code></strong>, <strong><code>outputs</code></strong>) :: <a href="/nangs/bocos#Boco"><code>Boco</code></a></p>
 </blockquote>
 <p>Dirichlet boundary condition: Fixed outputs.</p>
 

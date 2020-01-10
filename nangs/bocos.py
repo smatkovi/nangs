@@ -115,6 +115,8 @@ class PeriodicBoco(Boco):
 # Cell
 
 class DirichletBocoDataset(Dataset):
+    "Receives a dict of inputs and outputs and returns every possible combination of the elements in inputs \
+    that must match the outputs"
     def __init__(self, inputs, outputs):
         self.inputs = np.array([inputs[k] for k in inputs])
         self.outputs = np.array([outputs[k] for k in outputs])
