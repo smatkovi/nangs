@@ -130,8 +130,10 @@ class PDE:
         # train loop
         self.solution.to(device)
         best_loss = 1e8
+        hist = {'train_loss': [], 'val_loss': [], 'bocos': {boco.name: [] for boco in self.bocos}}
         mb = master_bar(range(1, self.epochs+1))
         for epoch in mb:
+            #train
             self.solution.train()
             pde_loss = []
             bocos_loss = {boco.name: [] for boco in self.bocos}
@@ -156,12 +158,47 @@ class PDE:
                 self.optimizer.zero_grad()
                 loss.backward()
                 self.optimizer.step()
-                mb.child.comment = f'loss={np.mean(pde_loss):.5f}'
-            if np.mean(pde_loss) < best_loss:
-                best_loss = np.mean(pde_loss)
+                mb.child.comment = f'train loss {np.mean(pde_loss):.5f}'
+
+            #evaluate
+            self.solution.eval()
+            val_loss = []
+            for inputs in progress_bar(self.dataloader['val'], parent=mb):
+                # compute pde solution
+                inputs = inputs.to(device)
+                inputs.requires_grad = True
+                outputs = self.solution(inputs)
+                # compute gradients of outputs w.r.t. inputs
+                grads, _inputs = self.computeGrads(inputs, outputs)
+                # compute loss
+                loss = self.computePDELoss(grads, _inputs, params).pow(2).mean()
+                val_loss.append(loss.item())
+                mb.child.comment = f'val loss {np.mean(val_loss):.5f}'
+
+            pde_total_loss = np.mean(pde_loss)
+            val_total_loss = np.mean(val_loss)
+            bocos_total_loss = 0
+            for boco in self.bocos:
+                bocos_loss[boco.name] = np.mean(bocos_loss[boco.name])
+                hist['bocos'][boco.name].append(bocos_loss[boco.name])
+                bocos_total_loss += bocos_loss[boco.name]
+            total_loss = pde_total_loss + bocos_total_loss
+
+            if total_loss < best_loss:
+                best_loss = total_loss
                 torch.save(self.solution.state_dict(), path)
-            mb.write(f'Epoch {epoch}/{self.epochs} : loss={np.mean(pde_loss):.5f}')
+
+            hist['train_loss'].append(total_loss)
+            hist['val_loss'].append(val_total_loss)
+
+            info = f'Epoch {epoch}/{self.epochs} Losses {total_loss:.5f} \n PDE  {pde_total_loss:.5f}'
+            for boco in self.bocos:
+                info += f'\n {boco.name} {bocos_loss[boco.name]:.5f}'
+            info += f'\n Val {val_total_loss:.5f} '
+            mb.write(info)
             #mb.first_bar.comment = f'best acc {best_acc:.5f} at epoch {best_e}'
+
+        return hist
 
     def initialize(self):
         self.dataset = {
