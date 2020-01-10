@@ -19,6 +19,8 @@ Our objective is to develop a new tool for simulating nature, using Neural Netwo
 
 Read our [paper](https://arxiv.org/abs/1912.04737) to know more.
 
+Read the [docs](https://juansensio.github.io/nangs/).
+
 ## Installing
 
 nangs is on PyPI so you can just run:
@@ -87,11 +89,11 @@ p0 = np.sin(2.*math.pi*x)
 boco = DirichletBoco({'x': x, 't': np.array([0])}, {'p': p0})
 pde.addBoco(boco)
     
+# define solution topology
+mlp = {'layers': 3, 'neurons': 100, 'activations': 'relu'}
+pde.buildModel(mlp)
+    
 if False:
-
-    # define solution topology
-    mlp = {'layers': 3, 'neurons': 100, 'activations': 'relu'}
-    pde.buildModel(mlp)
 
     # set optimization parameters
     pde.setSolverParams(lr=0.01, epochs=20, batch_size=50)

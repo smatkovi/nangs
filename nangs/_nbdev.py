@@ -6,6 +6,9 @@ index = {"PDE": "00_pde.ipynb",
          "Boco": "01_bocos.ipynb",
          "PeriodicBoco": "01_bocos.ipynb",
          "DirichletBoco": "01_bocos.ipynb",
+         "getActivation": "02_solution.ipynb",
+         "block": "02_solution.ipynb",
+         "Solution": "02_solution.ipynb",
          "checkIsListOfStr": "09_utils.ipynb",
          "checkUnique": "09_utils.ipynb",
          "initListOfStr": "09_utils.ipynb",
@@ -17,6 +20,7 @@ index = {"PDE": "00_pde.ipynb",
 
 modules = ["pde.py",
            "bocos.py",
+           "solution.py",
            "utils.py"]
 
 doc_url = "https://juansensio.github.io/nangs/"

@@ -5,6 +5,7 @@ __all__ = ['PDE']
 # Cell
 
 from .utils import *
+from .solution import *
 
 class PDE:
     "PDE class with basic functionality to solve PDEs with NNs"
@@ -69,3 +70,9 @@ class PDE:
         "Print summary of each boco"
         for boco in self.bocos:
             boco.summary(self.input_keys, self.output_keys, self.param_keys)
+
+    def buildModel(self, topo):
+        "Build an MLP to be the solution to the PDE"
+        n_inputs, n_outputs = len(self.input_keys), len(self.output_keys)
+        self.model = Solution(n_inputs, n_outputs, topo['layers'], topo['neurons'], topo['activations'])
+

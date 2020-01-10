@@ -27,6 +27,7 @@ summary: "Solving Partial Differential Equations with Neural Networks."
 <p>Nangs is a Python library built on top of Pytorch to solve Partial Differential Equations.</p>
 <p>Our objective is to develop a new tool for simulating nature, using Neural Networks as solution approximation to Partial Differential Equations, increasing accuracy and optimziation speed while reducing computational cost.</p>
 <p>Read our <a href="https://arxiv.org/abs/1912.04737">paper</a> to know more.</p>
+<p>Read the <a href="https://juansensio.github.io/nangs/">docs</a>.</p>
 
 </div>
 </div>
@@ -147,11 +148,11 @@ summary: "Solving Partial Differential Equations with Neural Networks."
 <span class="n">boco</span> <span class="o">=</span> <span class="n">DirichletBoco</span><span class="p">({</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="n">x</span><span class="p">,</span> <span class="s1">&#39;t&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">])},</span> <span class="p">{</span><span class="s1">&#39;p&#39;</span><span class="p">:</span> <span class="n">p0</span><span class="p">})</span>
 <span class="n">pde</span><span class="o">.</span><span class="n">addBoco</span><span class="p">(</span><span class="n">boco</span><span class="p">)</span>
     
+<span class="c1"># define solution topology</span>
+<span class="n">mlp</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;layers&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;neurons&#39;</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span> <span class="s1">&#39;activations&#39;</span><span class="p">:</span> <span class="s1">&#39;relu&#39;</span><span class="p">}</span>
+<span class="n">pde</span><span class="o">.</span><span class="n">buildModel</span><span class="p">(</span><span class="n">mlp</span><span class="p">)</span>
+    
 <span class="k">if</span> <span class="kc">False</span><span class="p">:</span>
-
-    <span class="c1"># define solution topology</span>
-    <span class="n">mlp</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;layers&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;neurons&#39;</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span> <span class="s1">&#39;activations&#39;</span><span class="p">:</span> <span class="s1">&#39;relu&#39;</span><span class="p">}</span>
-    <span class="n">pde</span><span class="o">.</span><span class="n">buildModel</span><span class="p">(</span><span class="n">mlp</span><span class="p">)</span>
 
     <span class="c1"># set optimization parameters</span>
     <span class="n">pde</span><span class="o">.</span><span class="n">setSolverParams</span><span class="p">(</span><span class="n">lr</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">epochs</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>

@@ -3,6 +3,7 @@
     "Overview": "/",
     "PDE": "/pde",
     "bocos": "/bocos",
+    "solutions": "/solution",
     "utils": "/utils"
   }
 }
