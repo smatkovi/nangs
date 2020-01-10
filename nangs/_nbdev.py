@@ -2,9 +2,12 @@
 
 __all__ = ["index", "modules", "custom_doc_links", "git_url"]
 
-index = {"PDE": "00_pde.ipynb",
+index = {"PDEDataset": "00_pde.ipynb",
+         "PDE": "00_pde.ipynb",
          "Boco": "01_bocos.ipynb",
+         "PeriodicBocoDataset": "01_bocos.ipynb",
          "PeriodicBoco": "01_bocos.ipynb",
+         "DirichletBocoDataset": "01_bocos.ipynb",
          "DirichletBoco": "01_bocos.ipynb",
          "getActivation": "02_solution.ipynb",
          "block": "02_solution.ipynb",
