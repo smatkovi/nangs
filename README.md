@@ -29,11 +29,9 @@ nangs is on PyPI so you can just run:
 
 You will also need to insall [Pytorch](https://pytorch.org/).
 
-Alternatively, you can use one of our Docker [images](https://hub.docker.com/repository/docker/sensioai/nangs). You will need [Docker](https://docs.docker.com/install/) 19.03 and, if you have an NVIDIA GPU, the NVIDIA Drivers (you do not need CUDA) and [nvidia-docker](https://github.com/NVIDIA/nvidia-docker). 
+Alternatively, you can use one of our Docker [images](https://hub.docker.com/repository/docker/sensioai/nangs). You will need [Docker](https://docs.docker.com/install/) 19.03 and, if you have an NVIDIA GPU, the NVIDIA Drivers (you do not need CUDA) and [nvidia-docker](https://github.com/NVIDIA/nvidia-docker). We have GPU and CPU images.
 
 ## Getting Started
-
-We have GPU and CPU images
 
 Let's assume we want to solve the following PDE:
 
@@ -215,7 +213,7 @@ plt.show()
 <div class="output_area" markdown="1">
 
 
-![png](docs/images/output_12_0.png)
+![png](docs/images/output_11_0.png)
 
 
 </div>
@@ -269,7 +267,7 @@ anim = animation.FuncAnimation(fig, animate, frames=len(t), interval=100, blit=T
 <div class="output_area" markdown="1">
 
 
-![png](docs/images/output_13_0.png)
+![png](docs/images/output_12_0.png)
 
 
 </div>
