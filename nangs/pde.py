@@ -37,7 +37,7 @@ class PDEDataset(Dataset):
 
 class PDE:
     "PDE class with basic functionality to solve PDEs with NNs"
-    def __init__(self, inputs, outputs, params=None):
+    def __init__(self, inputs, outputs, params=None, order=1):
 
         # check lists of unique strings, non-repeated
         checkIsListOfStr(inputs)
@@ -68,6 +68,8 @@ class PDE:
         self.bocos = []
 
         self.init = False
+        self.order = order
+        self.eval = False
 
     def summary(self):
         "Print a summary of the PDE inputs, outputs, params and bocos."
@@ -80,6 +82,7 @@ class PDE:
         print('')
 
     def setValues(self, values, train=True):
+        self.eval = not train
         "Set values for inputs and params"
         checkValidDict(values)
         for key in values:
@@ -130,7 +133,9 @@ class PDE:
         # train loop
         self.solution.to(device)
         best_loss = 1e8
-        hist = {'train_loss': [], 'val_loss': [], 'bocos': {boco.name: [] for boco in self.bocos}}
+        hist = {'train_loss': [], 'bocos': {boco.name: [] for boco in self.bocos}}
+        if self.eval:
+            hist['val_loss'] = []
         mb = master_bar(range(1, self.epochs+1))
         for epoch in mb:
             #train
@@ -160,23 +165,7 @@ class PDE:
                 self.optimizer.step()
                 mb.child.comment = f'train loss {np.mean(pde_loss):.5f}'
 
-            #evaluate
-            self.solution.eval()
-            val_loss = []
-            for inputs in progress_bar(self.dataloader['val'], parent=mb):
-                # compute pde solution
-                inputs = inputs.to(device)
-                inputs.requires_grad = True
-                outputs = self.solution(inputs)
-                # compute gradients of outputs w.r.t. inputs
-                grads, _inputs = self.computeGrads(inputs, outputs)
-                # compute loss
-                loss = self.computePDELoss(grads, _inputs, params).pow(2).mean()
-                val_loss.append(loss.item())
-                mb.child.comment = f'val loss {np.mean(val_loss):.5f}'
-
             pde_total_loss = np.mean(pde_loss)
-            val_total_loss = np.mean(val_loss)
             bocos_total_loss = 0
             for boco in self.bocos:
                 bocos_loss[boco.name] = np.mean(bocos_loss[boco.name])
@@ -184,17 +173,35 @@ class PDE:
                 bocos_total_loss += bocos_loss[boco.name]
             total_loss = pde_total_loss + bocos_total_loss
 
-            if total_loss < best_loss:
-                best_loss = total_loss
-                torch.save(self.solution.state_dict(), path)
-
             hist['train_loss'].append(total_loss)
-            hist['val_loss'].append(val_total_loss)
-
             info = f'Epoch {epoch}/{self.epochs} Losses {total_loss:.5f} \n PDE  {pde_total_loss:.5f}'
             for boco in self.bocos:
                 info += f'\n {boco.name} {bocos_loss[boco.name]:.5f}'
-            info += f'\n Val {val_total_loss:.5f} '
+
+            if self.eval:
+                #evaluate
+                self.solution.eval()
+                val_loss = []
+                for inputs in progress_bar(self.dataloader['val'], parent=mb):
+                    # compute pde solution
+                    inputs = inputs.to(device)
+                    inputs.requires_grad = True
+                    outputs = self.solution(inputs)
+                    # compute gradients of outputs w.r.t. inputs
+                    grads, _inputs = self.computeGrads(inputs, outputs)
+                    # compute loss
+                    loss = self.computePDELoss(grads, _inputs, params).pow(2).mean()
+                    val_loss.append(loss.item())
+                    mb.child.comment = f'val loss {np.mean(val_loss):.5f}'
+                # save model if best loss (this does not include bocos losses !!!)
+                val_total_loss = np.mean(val_loss)
+                if val_total_loss < best_loss:
+                    best_loss = total_loss
+                    torch.save(self.solution.state_dict(), path)
+
+                hist['val_loss'].append(val_total_loss)
+                info += f'\n Val {val_total_loss:.5f} '
+
             mb.write(info)
             #mb.first_bar.comment = f'best acc {best_acc:.5f} at epoch {best_e}'
 
@@ -214,17 +221,43 @@ class PDE:
         self.init = True
 
     def computeGrads(self, inputs, outputs):
-        # compute gradients
-        _grads, = torch.autograd.grad(outputs, inputs,
-                    grad_outputs=outputs.data.new(outputs.shape).fill_(1),
-                    create_graph=True, only_inputs=True)
-        # assign keys to gradients
-        grads = {output: {
-            inp: _grads[:,j] for j, inp in enumerate(self.input_keys)
-        } for output in self.output_keys}
+        # init grads
+        grads = {o: {i: [] for i in self.input_keys} for o in self.output_keys}
+
+        # compute first order derivatives
+        for i, output in enumerate(self.output_keys):
+            _grads = self.computeGrad(outputs[:,i], inputs)
+            #print(_grads)
+            # save in dict
+            for j, inp in enumerate(self.input_keys):
+                grads[output][inp] = _grads[:,j]
+
+            # compute higher order derivatives (only works for second order)
+            if self.order > 1:
+                #order = 1
+                #while order < self.order:
+                #order += 1
+
+                order = 2
+                grads[f'{order}{output}'] = {}
+                # compute gradients of gradients
+                for j, inp in enumerate(self.input_keys):
+                    __grads = self.computeGrad(_grads[:,j], inputs)
+                    # save in dict
+                    for k, inp2 in enumerate(self.input_keys):
+                        grads[f'{order}{output}'][f'{inp}{inp2}'] = __grads[:,k]
+
         # assign keys to inputs
         _inputs = {inp: inputs[:,i] for i, inp in enumerate(self.input_keys)}
+
         return grads, _inputs
+
+    def computeGrad(self, outputs, inputs):
+        # torch.autograd.grad -> Computes and returns the sum of gradients of outputs w.r.t. the inputs.
+        _grads, = torch.autograd.grad(outputs, inputs,
+                        grad_outputs=outputs.data.new(outputs.shape).fill_(1),
+                        create_graph=True, only_inputs=True)
+        return _grads
 
     def computePDELoss(self, inputs, outputs, params=None):
         print('This function has to be overloaded by a child class!')
@@ -232,7 +265,7 @@ class PDE:
     def load_state_dict(self, path):
         self.solution.load_state_dict(torch.load(path))
 
-    def eval(self, inputs, device):
+    def evaluate(self, inputs, device):
         "Evaluate solution"
         checkValidDict(inputs)
         checkDictArray(inputs, self.input_keys)

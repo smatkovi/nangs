@@ -40,7 +40,9 @@ class Solution(nn.Module):
 
 def getActivation(a):
     if a == 'relu': return nn.ReLU(inplace=True)
-    elif a == 'sigmoid': return nn.Sigmoid(inplace=True)
+    if a == 'elu': return nn.ELU(inplace=True)
+    if a == 'selu': return nn.SELU(inplace=True)
+    elif a == 'sigmoid': return nn.Sigmoid()
     else: raise Exception(f'activation function {a} not valid')
 
 def block(i, o, a):
