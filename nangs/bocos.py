@@ -139,11 +139,10 @@ class DirichletBocoDataset(Dataset):
         return self.len
 
     def __getitem__(self, idx):
-        item1, item2 = np.zeros(len(self.inputs)), np.zeros(len(self.outputs))
+        item1 = np.zeros(len(self.inputs))
         for i, input in enumerate(self.inputs):
             item1[i] = input[(idx // self.mods[i]) % len(input)]
-        for i, output in enumerate(self.outputs):
-            item2[i] = output[(idx // self.mods[i]) % len(output)]
+        item2 = self.outputs[:,idx]
         return torch.from_numpy(item1).float(), torch.from_numpy(item2).float()
 
 class DirichletBoco(Boco):
@@ -253,7 +252,6 @@ class NeumannBoco(Boco):
         self.dataloader = DataLoader(self.dataset, batch_size=len(self.dataset), num_workers=4)
         self.loss = torch.nn.MSELoss()
         self._inputs = next(iter(self.dataloader))
-
     def computeLoss(self, model, device):
         self._inputs = self._inputs.to(device)
         self._inputs.requires_grad = True

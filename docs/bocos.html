@@ -170,7 +170,7 @@ Input 2:  {&#39;a&#39;: array([1]), &#39;b&#39;: array([1, 2, 3])}
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="DirichletBoco" class="doc_header"><code>class</code> <code>DirichletBoco</code><a href="https://github.com/juansensio/nangs/tree/master/nangs/bocos.py#L149" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>DirichletBoco</code>(<strong><code>name</code></strong>, <strong><code>inputs</code></strong>, <strong><code>outputs</code></strong>) :: <a href="/nangs/bocos#Boco"><code>Boco</code></a></p>
+<h2 id="DirichletBoco" class="doc_header"><code>class</code> <code>DirichletBoco</code><a href="https://github.com/juansensio/nangs/tree/master/nangs/bocos.py#L148" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>DirichletBoco</code>(<strong><code>name</code></strong>, <strong><code>inputs</code></strong>, <strong><code>outputs</code></strong>) :: <a href="/nangs/bocos#Boco"><code>Boco</code></a></p>
 </blockquote>
 <p>Dirichlet boundary condition: Fixed outputs.</p>
 
@@ -194,13 +194,14 @@ Input 2:  {&#39;a&#39;: array([1]), &#39;b&#39;: array([1, 2, 3])}
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">pde</span> <span class="o">=</span> <span class="n">PDE</span><span class="p">(</span><span class="n">inputs</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">],</span> <span class="n">outputs</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">])</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">pde</span> <span class="o">=</span> <span class="n">PDE</span><span class="p">(</span><span class="n">inputs</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">],</span> <span class="n">outputs</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="s1">&#39;d&#39;</span><span class="p">])</span>
 
 <span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">])</span>
 <span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
 <span class="n">c</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">])</span>
+<span class="n">d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="o">-</span><span class="mi">6</span><span class="p">])</span>
 
-<span class="n">boco</span> <span class="o">=</span> <span class="n">DirichletBoco</span><span class="p">(</span><span class="s1">&#39;dirichlet1&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;a&#39;</span><span class="p">:</span> <span class="n">a</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">:</span> <span class="n">b</span><span class="p">},</span> <span class="p">{</span><span class="s1">&#39;c&#39;</span><span class="p">:</span> <span class="n">c</span><span class="p">})</span>
+<span class="n">boco</span> <span class="o">=</span> <span class="n">DirichletBoco</span><span class="p">(</span><span class="s1">&#39;dirichlet1&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;a&#39;</span><span class="p">:</span> <span class="n">a</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">:</span> <span class="n">b</span><span class="p">},</span> <span class="p">{</span><span class="s1">&#39;c&#39;</span><span class="p">:</span> <span class="n">c</span><span class="p">,</span> <span class="s1">&#39;d&#39;</span><span class="p">:</span> <span class="n">d</span><span class="p">})</span>
 <span class="n">pde</span><span class="o">.</span><span class="n">addBoco</span><span class="p">(</span><span class="n">boco</span><span class="p">)</span>
     
 <span class="n">pde</span><span class="o">.</span><span class="n">bocoSummary</span><span class="p">()</span>
@@ -219,7 +220,7 @@ Input 2:  {&#39;a&#39;: array([1]), &#39;b&#39;: array([1, 2, 3])}
 <pre>dirichlet1 summary:
 Type: dirichlet
 Inputs:  {&#39;a&#39;: array([0]), &#39;b&#39;: array([1, 2, 3])}
-Outputs:  {&#39;c&#39;: array([-1, -2, -3])}
+Outputs:  {&#39;c&#39;: array([-1, -2, -3]), &#39;d&#39;: array([-4, -5, -6])}
 
 </pre>
 </div>
@@ -268,9 +269,9 @@ Outputs:  {&#39;c&#39;: array([-1, -2, -3])}
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="NeumannBocoDataset" class="doc_header"><code>class</code> <code>NeumannBocoDataset</code><a href="https://github.com/juansensio/nangs/tree/master/nangs/bocos.py#L199" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>NeumannBocoDataset</code>(<strong><code>inputs</code></strong>) :: <code>Dataset</code></p>
+<h2 id="NeumannBocoDataset" class="doc_header"><code>class</code> <code>NeumannBocoDataset</code><a href="https://github.com/juansensio/nangs/tree/master/nangs/bocos.py#L198" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>NeumannBocoDataset</code>(<strong><code>inputs</code></strong>) :: <code>Dataset</code></p>
 </blockquote>
-<p>Receives a dict of inputs and eturns every possible combination of the elements</p>
+<p>Receives a dict of inputs and returns every possible combination of the elements</p>
 
 </div>
 
@@ -289,7 +290,7 @@ Outputs:  {&#39;c&#39;: array([-1, -2, -3])}
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="NeumannBoco" class="doc_header"><code>class</code> <code>NeumannBoco</code><a href="https://github.com/juansensio/nangs/tree/master/nangs/bocos.py#L225" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>NeumannBoco</code>(<strong><code>name</code></strong>, <strong><code>inputs</code></strong>, <strong><code>grads</code></strong>) :: <a href="/nangs/bocos#Boco"><code>Boco</code></a></p>
+<h2 id="NeumannBoco" class="doc_header"><code>class</code> <code>NeumannBoco</code><a href="https://github.com/juansensio/nangs/tree/master/nangs/bocos.py#L224" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>NeumannBoco</code>(<strong><code>name</code></strong>, <strong><code>inputs</code></strong>, <strong><code>grads</code></strong>) :: <a href="/nangs/bocos#Boco"><code>Boco</code></a></p>
 </blockquote>
 <p>Neumann boundary condition: Enforces the value of certain grads to be 0</p>
 
