@@ -116,7 +116,9 @@ class PDE:
         self.solution = model
         self.optimizer = optimizer
 
-    def solve(self, epochs=30, batch_size=32, device="cuda", path="best.pth"):
+    def solve(self, epochs=30, batch_size=32, device=None, path="best.pth"):
+        if not device:
+            device = "cuda" if torch.cuda.is_available() else "cpu"
         "Find a solution to the PDE"
         # initialize dataloaders
         self.initialize(batch_size)
@@ -223,7 +225,9 @@ class PDE:
 
         return hist
 
-    def warm(self, epochs=30, batch_size=32, device="cuda", bocos=None):
+    def warm(self, epochs=30, batch_size=32, device=None, bocos=None):
+        if not device:
+            device = "cuda" if torch.cuda.is_available() else "cpu"
         # initialize dataloaders
         self.initialize(batch_size, only_bocos=True)
         # train loop
@@ -325,7 +329,9 @@ class PDE:
     def load_state_dict(self, path):
         self.solution.load_state_dict(torch.load(path))
 
-    def evaluate(self, inputs, device="cuda"):
+    def evaluate(self, inputs, device=None):
+        if not device:
+            device = "cuda" if torch.cuda.is_available() else "cpu"
         "Evaluate solution"
         checkValidDict(inputs)
         checkDictArray(inputs, self.input_keys)
