@@ -99,14 +99,16 @@ class PeriodicBoco(Boco):
         print('Input 2: ', self.inputs2)
         print('')
 
-    def initialize(self):
+    def initialize(self, batch_size):
         self.dataset = PeriodicBocoDataset(self.inputs1, self.inputs2)
         self.loss = torch.nn.MSELoss()
         # batch training in bocos ??
-        self.dataloader = DataLoader(self.dataset, batch_size=len(self.dataset), num_workers=4)
-        self._inputs1, self._inputs2 = next(iter(self.dataloader))
+        self.dataloader = DataLoader(self.dataset, batch_size=batch_size, shuffle=True)
+
 
     def computeLoss(self, model, device):
+        # take a random batch, reshufle
+        self._inputs1, self._inputs2 = next(iter(self.dataloader))
         inputs1 = self._inputs1.to(device)
         inputs2 = self._inputs2.to(device)
         outputs1 = model(inputs1)
@@ -182,13 +184,14 @@ class DirichletBoco(Boco):
         print('Outputs: ', self.outputs)
         print('')
 
-    def initialize(self):
+    def initialize(self, batch_size):
         self.dataset = DirichletBocoDataset(self.inputs, self.outputs)
-        self.dataloader = DataLoader(self.dataset, batch_size=len(self.dataset), num_workers=4)
+        self.dataloader = DataLoader(self.dataset, batch_size=batch_size, shuffle=True)
         self.loss = torch.nn.MSELoss()
-        self._inputs, self._outputs = next(iter(self.dataloader))
 
     def computeLoss(self, model, device):
+        # take a random batch, reshuffle
+        self._inputs, self._outputs = next(iter(self.dataloader))
         self._inputs, self._outputs = self._inputs.to(device), self._outputs.to(device)
         preds = model(self._inputs)
         return self.loss(preds, self._outputs)
@@ -247,12 +250,14 @@ class NeumannBoco(Boco):
         print('Grads: ', self.grads)
         print('')
 
-    def initialize(self):
+    def initialize(self, batch_size):
         self.dataset = NeumannBocoDataset(self.inputs)
-        self.dataloader = DataLoader(self.dataset, batch_size=len(self.dataset), num_workers=4)
+        self.dataloader = DataLoader(self.dataset, batch_size=batch_size, shuffle=True)
         self.loss = torch.nn.MSELoss()
-        self._inputs = next(iter(self.dataloader))
+
     def computeLoss(self, model, device):
+        # take a random batch, reshuffle
+        self._inputs = next(iter(self.dataloader))
         self._inputs = self._inputs.to(device)
         self._inputs.requires_grad = True
         preds = model(self._inputs)

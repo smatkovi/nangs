@@ -17,7 +17,7 @@ entries:
       url: /bocos
     - output: web,pdf
       title: solutions
-      url: /solution
+      url: /solutions
     - output: web,pdf
       title: utils
       url: /utils

@@ -5,7 +5,6 @@ __all__ = ['PDEDataset', 'PDE']
 # Cell
 
 from .utils import *
-from .solution import *
 import torch
 from torch.utils.data import Dataset, DataLoader
 from fastprogress import master_bar, progress_bar
@@ -67,7 +66,8 @@ class PDE:
         # bocos
         self.bocos = []
 
-        self.init = False
+        self.n_inputs = len(self.input_keys)
+        self.n_outputs = len(self.output_keys)
         self.order = order
         self.eval = False
 
@@ -112,22 +112,14 @@ class PDE:
         for boco in self.bocos:
             boco.summary(self.input_keys, self.output_keys, self.param_keys)
 
-    def buildSolution(self, topo):
-        "Build an MLP to be the solution to the PDE"
-        n_inputs, n_outputs = len(self.input_keys), len(self.output_keys)
-        self.solution = Solution(n_inputs, n_outputs, topo['layers'], topo['neurons'], topo['activations'])
+    def compile(self, model, optimizer):
+        self.solution = model
+        self.optimizer = optimizer
 
-    def compile(self, lr=3e-4, epochs=30, batch_size=32):
-        "Set the required parameters for training"
-        self.optimizer = torch.optim.Adam(self.solution.parameters(), lr=lr)
-        self.epochs = epochs
-        self.bs = batch_size
-
-    def solve(self, device, path):
+    def solve(self, epochs=30, batch_size=32, device="cuda", path="best.pth"):
         "Find a solution to the PDE"
-        # initialize dataladers
-        if not self.init:
-            self.initialize()
+        # initialize dataloaders
+        self.initialize(batch_size)
         # convert params to tensors
         params = {k: torch.FloatTensor(self.params[k]).to(device) for k in self.params}
         # train loop
@@ -136,7 +128,7 @@ class PDE:
         hist = {'train_loss': [], 'bocos': {boco.name: [] for boco in self.bocos}}
         if self.eval:
             hist['val_loss'] = []
-        mb = master_bar(range(1, self.epochs+1))
+        mb = master_bar(range(1, epochs+1))
         for epoch in mb:
             #train
             self.solution.train()
@@ -174,7 +166,6 @@ class PDE:
 
                 mb.child.comment = f'train loss {np.mean(pdes_losses):.5f}'
                 pdes_losses.append(pde_loss)
-                self.optimizer.zero_grad()
 
             pde_total_loss = np.mean(pdes_losses, axis=0)
             bocos_total_loss = 0
@@ -185,7 +176,7 @@ class PDE:
             total_loss = np.mean(pde_total_loss) + bocos_total_loss
 
             hist['train_loss'].append(total_loss)
-            info = f'Epoch {epoch}/{self.epochs} Losses {total_loss:.5f} \n PDE  [ '
+            info = f'Epoch {epoch}/{epochs} Losses {total_loss:.5f} \n PDE  [ '
             for l in pde_total_loss:
                 info += f"{l:.5f} "
             info += "] "
@@ -232,18 +223,52 @@ class PDE:
 
         return hist
 
-    def initialize(self):
-        self.dataset = {
+    def warm(self, epochs=30, batch_size=32, device="cuda", bocos=None):
+        # initialize dataloaders
+        self.initialize(batch_size, only_bocos=True)
+        # train loop
+        self.solution.to(device)
+        self.solution.train()
+        # keep some bocos to warm (all by default)
+        boco_names = [boco.name for boco in self.bocos]
+        if bocos:
+            for boco in bocos:
+                if boco not in boco_names:
+                    raise Exception (f"Boco {boco} not found")
+            self.warm_bocos = [boco for boco in self.bocos if boco.name in bocos]
+        else:
+            self.warm_bocos = self.bocos
+        hist = {boco.name: [] for boco in self.warm_bocos}
+        # train
+        for epoch in progress_bar(range(1, epochs+1)):
+            # start accumulating gradients
+            self.optimizer.zero_grad()
+            bocos_loss = {boco.name: [] for boco in self.bocos}
+            for boco in self.warm_bocos:
+                # accumulate gradients for each boco
+                boco_loss = boco.computeLoss(self.solution, device)
+                bocos_loss[boco.name].append(boco_loss.item())
+                boco_loss.backward()
+            # update weights
+            self.optimizer.step()
+            # visualize losses
+            for boco in self.warm_bocos:
+                bocos_loss[boco.name] = np.mean(bocos_loss[boco.name])
+                hist[boco.name].append(bocos_loss[boco.name])
+        return hist
+
+    def initialize(self, bs, only_bocos=False):
+        for boco in self.bocos:
+            boco.initialize(bs)
+        if not only_bocos:
+            self.dataset = {
             'train': PDEDataset(self.train_inputs),
             'val': PDEDataset(self.test_inputs)
-        }
-        self.dataloader = {
-            'train': DataLoader(self.dataset['train'], batch_size=self.bs, shuffle=True, num_workers=4),
-            'val': DataLoader(self.dataset['val'], batch_size=self.bs, shuffle=False, num_workers=4)
-        }
-        for boco in self.bocos:
-            boco.initialize()
-        self.init = True
+            }
+            self.dataloader = {
+                'train': DataLoader(self.dataset['train'], batch_size=bs, shuffle=True),
+                'val': DataLoader(self.dataset['val'], batch_size=bs, shuffle=False)
+            }
 
     def computeGrads(self, inputs, outputs):
         # init grads
@@ -300,7 +325,7 @@ class PDE:
     def load_state_dict(self, path):
         self.solution.load_state_dict(torch.load(path))
 
-    def evaluate(self, inputs, device):
+    def evaluate(self, inputs, device="cuda"):
         "Evaluate solution"
         checkValidDict(inputs)
         checkDictArray(inputs, self.input_keys)
@@ -313,10 +338,11 @@ class PDE:
         # build dataset
         dataset = PDEDataset(self.test_inputs)
         outputs = []
+        self.solution.to(device)
         self.solution.eval()
         for i in range(len(dataset)):
-            input = dataset[i].to(device)
-            outputs.append(self.solution(input).cpu().detach().numpy())
+            input = dataset[i].to(device).unsqueeze(0)
+            outputs.append(self.solution(input).cpu().detach().numpy()[0])
         outputs = np.array(outputs)
         for i, k in enumerate(self.output_keys):
             self.outputs[k] = outputs[:,i]

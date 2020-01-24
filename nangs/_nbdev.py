@@ -11,9 +11,9 @@ index = {"PDEDataset": "00_pde.ipynb",
          "DirichletBoco": "01_bocos.ipynb",
          "NeumannBocoDataset": "01_bocos.ipynb",
          "NeumannBoco": "01_bocos.ipynb",
-         "Solution": "02_solution.ipynb",
-         "getActivation": "02_solution.ipynb",
-         "block": "02_solution.ipynb",
+         "get_activation": "02_solutions.ipynb",
+         "block": "02_solutions.ipynb",
+         "MLP": "02_solutions.ipynb",
          "checkIsListOfStr": "09_utils.ipynb",
          "checkUnique": "09_utils.ipynb",
          "checkNoRepeated": "09_utils.ipynb",
@@ -23,7 +23,7 @@ index = {"PDEDataset": "00_pde.ipynb",
 
 modules = ["pde.py",
            "bocos.py",
-           "solution.py",
+           "solutions.py",
            "utils.py"]
 
 doc_url = "https://juansensio.github.io/nangs/"
