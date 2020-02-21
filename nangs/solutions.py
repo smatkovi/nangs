@@ -9,6 +9,7 @@ import torch
 def get_activation(a):
     if a == "relu": return torch.nn.ReLU(inplace=True)
     elif a == "sigmoid": return torch.nn.Sigmoid()
+    elif a == "softsign": return torch.nn.Softsign()
     else: raise Exception("invalid activation")
 
 def block(i, o, a):
@@ -18,7 +19,7 @@ def block(i, o, a):
     )
 
 class MLP(torch.nn.Module):
-    def __init__(self, inputs, outputs, layers, neurons, activations="relu"):
+    def __init__(self, inputs, outputs, layers, neurons, activations="softsign"):
         super().__init__()
         self.fc_in = block(inputs, neurons, activations)
         self.fc_hidden = torch.nn.ModuleList()
